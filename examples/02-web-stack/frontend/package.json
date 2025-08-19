@@ -1,0 +1,19 @@
+{
+  "name": "todo-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run server.ts",
+    "start": "bun run server.ts"
+  },
+  "dependencies": {
+    "bun-plugin-tailwind": "latest",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.1.14"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1"
+  }
+}
