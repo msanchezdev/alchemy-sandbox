@@ -1,0 +1,58 @@
+{
+  "kind": "docker::api::Network",
+  "id": "public_1",
+  "fqn": "sandbox/msanchezdev/public_1",
+  "seq": 0,
+  "data": {},
+  "status": "updated",
+  "output": {
+    "Symbol(alchemy::ResourceKind)": "docker::api::Network",
+    "Symbol(alchemy::ResourceID)": "public_1",
+    "Symbol(alchemy::ResourceFQN)": "sandbox/msanchezdev/public_1",
+    "Symbol(alchemy::ResourceScope)": {
+      "@scope": null
+    },
+    "Symbol(alchemy::ResourceSeq)": 0,
+    "Name": "public_1",
+    "Id": "d8ea5f8625447717a5437c359bc2dffe8b6895ebebd6936478393591a1dcef9f",
+    "Created": "2025-09-01T17:32:28.063954619Z",
+    "Scope": "local",
+    "Driver": "bridge",
+    "EnableIPv4": true,
+    "EnableIPv6": false,
+    "IPAM": {
+      "Driver": "default",
+      "Options": null,
+      "Config": [
+        {
+          "Subnet": "10.33.0.0/16",
+          "IPRange": "10.33.25.0/24",
+          "Gateway": "10.33.0.1"
+        }
+      ]
+    },
+    "Internal": false,
+    "Attachable": false,
+    "Ingress": false,
+    "ConfigFrom": {
+      "Network": ""
+    },
+    "ConfigOnly": false,
+    "Containers": {},
+    "Options": {},
+    "Labels": {}
+  },
+  "props": {
+    "ipv4": [
+      {
+        "subnet": "10.33.0.0/16",
+        "gateway": "10.33.0.1",
+        "ipRange": "10.33.25.0/24"
+      }
+    ],
+    "attachable": false,
+    "dockerHost": {
+      "url": "ssh://3.135.10.112:22"
+    }
+  }
+}

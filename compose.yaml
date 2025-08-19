@@ -1,0 +1,58 @@
+services:
+  # Bun has an issue where theHttpsAgent doesnt send the certificate so it's failing:
+  # https://github.com/oven-sh/bun/issues/21643
+  dind:
+    image: docker:dind
+    privileged: true
+    profiles:
+      - secure
+    ports:
+      - 12376:2376
+    volumes:
+      - ./node_modules/.alchemy-sandbox/dind/certs:/certs
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_HOST=tcp://localhost:2376
+    command:
+      - dockerd
+      - -H=tcp://0.0.0.0:2376
+      - -H=unix:///var/run/docker.sock
+      - --tlsverify
+      - --tlscacert=/certs/server/ca.pem
+      - --tlscert=/certs/server/cert.pem
+      - --tlskey=/certs/server/key.pem
+
+  dind-insecure:
+    image: docker:dind
+    privileged: true
+    profiles:
+      - insecure
+    ports:
+      - 12376:2376
+    volumes:
+      - ./node_modules/.alchemy-sandbox/dind/certs:/certs
+    environment:
+      - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_HOST=tcp://localhost:2376
+    command:
+      - dockerd
+      - -H=tcp://0.0.0.0:2376
+      - -H=unix:///var/run/docker.sock
+      - --insecure-registry=selfhosted-registry:5000
+
+  selfhosted-registry:
+    image: registry:3
+    volumes:
+      - ./node_modules/.alchemy-sandbox/selfhosted-registry/data:/var/lib/registry
+      - ./node_modules/.alchemy-sandbox/selfhosted-registry/auth:/auth
+      # - ./node_modules/.alchemy-sandbox/selfhosted-registry/certs:/certs
+    ports:
+      - "5000:5000"
+    environment:
+      # - REGISTRY_HTTP_ADDR=0.0.0.0:5000
+      # - REGISTRY_HTTP_TLS_KEY=/certs/server/key.pem
+      # - REGISTRY_HTTP_TLS_CERTIFICATE=/certs/server/cert.pem
+  #     - REGISTRY_HTTP_TLS_ROOTCERTIFICATE=/certs/server/ca.pem
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd
