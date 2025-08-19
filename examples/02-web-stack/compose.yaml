@@ -1,0 +1,120 @@
+# Docker Compose Equivalent
+#
+# This file shows what the Alchemy configuration (index.ts) would look like
+# as a traditional docker-compose.yml file.
+#
+# Key Differences:
+# - Alchemy: Type-safe TypeScript with IDE autocomplete
+# - Compose: YAML with string-based configuration
+# - Alchemy: Programmatic control and dynamic values
+# - Compose: Static configuration
+# - Alchemy: Resource state management and reconciliation
+# - Compose: Simple declarative deployment
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:16-alpine
+    container_name: web-stack-database
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: appdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "appuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Bun API Backend
+  backend:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    image: ghcr.io/msanchezdev/alchemy-sandbox/examples/02-web-stack/api:1.0.0
+    container_name: web-stack-backend
+    environment:
+      NODE_ENV: production
+      # Note: In compose, you can't dynamically reference container names like in Alchemy
+      # DATABASE_URL: `postgresql://appuser:secretpassword@${database.Name}:5432/appdb`
+      DATABASE_URL: postgresql://appuser:secretpassword@database:5432/appdb
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - public
+      - private
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    restart: unless-stopped
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: ghcr.io/msanchezdev/alchemy-sandbox/examples/02-web-stack/frontend:1.0.0
+    container_name: web-stack-frontend
+    ports:
+      - "3001:3001"
+    networks:
+      - public
+    depends_on:
+      - backend
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:3001').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+    restart: unless-stopped
+
+networks:
+  # Public network - accessible from host
+  public:
+    driver: bridge
+    name: web-stack-public
+
+  # Private network - isolated from host
+  private:
+    driver: bridge
+    internal: true
+    name: web-stack-private
+
+volumes:
+  postgres-data:
+    name: web-stack-postgres-data
+
+# Usage:
+#   docker compose up -d          # Start all services
+#   docker compose logs -f        # View logs
+#   docker compose down           # Stop and remove containers
+#   docker compose down -v        # Stop and remove containers + volumes
+#
+# Alchemy Advantages:
+#   ✅ Type safety - catch errors before runtime
+#   ✅ IDE autocomplete - know available options
+#   ✅ Dynamic configuration - use variables, conditionals
+#   ✅ State management - reconcile desired vs actual state
+#   ✅ Resource references - use container.Name in other configs
+#   ✅ Programmatic control - loops, conditionals, functions
+#   ✅ Better debugging - TypeScript stack traces
+#   ✅ Integrated with code - same language as application
+#
+# Docker Compose Advantages:
+#   ✅ Simpler for basic use cases
+#   ✅ Widely known and supported
+#   ✅ Standalone tool (no code required)
+#   ✅ Good for static configurations

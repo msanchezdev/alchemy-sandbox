@@ -1,0 +1,19 @@
+{
+  "name": "alchemy-sandbox",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.5",
+    "@types/bun": "latest",
+    "@types/luxon": "^3.6.2",
+    "@types/tar-fs": "^2.0.4",
+    "luxon": "^3.6.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "tar-fs": "^3.1.1"
+  }
+}

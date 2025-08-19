@@ -1,0 +1,13 @@
+{
+  "name": "web-stack-api",
+  "version": "1.0.0",
+  "description": "Simple REST API using Bun's native PostgreSQL client",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --watch index.ts",
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
